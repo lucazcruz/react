@@ -3,6 +3,10 @@ body {
   margin: 20px;
 }
 
+ol {
+  list-style: none;
+}
+
 .status {
   margin-bottom: 10px;
 }
@@ -28,3 +32,10 @@ body {
   margin-top: -1px;
 }
 
+.game {
+  display: flex;
+}
+
+.game-info {
+  margin-left: 20px;
+}

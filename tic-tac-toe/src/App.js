@@ -25,36 +25,29 @@ const Squares = ({ onClickSquare, value }) => {
   return <button className="square" onClick={onClickSquare}>{value}</button>;
 }
 
-const Board = () => {
-  const [squares, setSquares] = useState(Array(9).fill(null))
-  const [xIsNext, setXIsNext] = useState(true)
-
+const Board = ({ xIsNext, squares, onPlay}) => {
   function handleClick(i) {
     if (calculateWinner(squares) || squares[i]) {
       return;
     }
 
     const nextSquare = squares.slice();
-
     if (xIsNext) {
       nextSquare[i] = 'X'
     } else {
       nextSquare[i] = 'O'
     }
 
-    setSquares(nextSquare)
-    setXIsNext(!xIsNext)
+    onPlay(nextSquare)
   }
 
   const winner = calculateWinner(squares);
   let status;
-
   if (winner) {
     status = `Winner: ${winner}`
   } else {
     status = `Next is: ${xIsNext? 'X': 'O'}`
   }
-
 
   return (
     <>
@@ -78,8 +71,53 @@ const Board = () => {
   )
 }
 
+const Game = () => {
+  const [xIsNext, setXIsNext] = useState(true);
+  const [history, setHistory] = useState([Array(9).fill(null)]);
+  const [currentMove, setCurrentMove] = useState(0);
+  const currentGame = history[currentMove];
+
+  function handlePlay(nextSquare) {
+    const nextHistory = [...history.slice(0, currentMove +1), nextSquare]
+    setCurrentMove(nextHistory.length -1)
+    setHistory(nextHistory);
+    setXIsNext(!xIsNext);
+  }
+
+  function jumpTo(nextMove) {
+    setCurrentMove(nextMove)
+    setXIsNext(nextMove % 2 === 0);
+  }
+
+  const moves = history.map((squares, move) => {
+    let description;
+    if (move > 0) {
+      description = `Go to move #${move}`;
+    } else {
+      description = `Go to game start`;
+    }
+
+    return (
+      <li key={move} >
+        <button onClick={() => jumpTo(move)} >{description}</button>
+      </li>
+    )
+  })
+
+  return (
+    <div className="game" >
+      <div className="game-board">
+        <Board xIsNext={xIsNext} squares={currentGame} onPlay={handlePlay}/>
+      </div>
+      <ol className="game-info" >
+        {moves}
+      </ol>
+    </div>
+  )
+}
+
 const App = () => {
-  return <Board />
+  return <Game />
 }
 
 export default App;
